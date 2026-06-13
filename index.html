@@ -1,0 +1,705 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>DocuMind - Smart Document Search</title>
+
+  <style>
+    :root {
+      --bg: #eef4f1;
+      --bg-2: #f7f3e8;
+      --card: rgba(255, 255, 255, 0.82);
+      --card-solid: #ffffff;
+      --text: #172026;
+      --muted: #66727a;
+      --line: rgba(23, 32, 38, 0.12);
+      --primary: #116a63;
+      --primary-dark: #0b4f49;
+      --blue: #2d6cdf;
+      --gold: #d99a2b;
+      --success: #16855f;
+      --danger: #b84d4d;
+      --shadow: 0 20px 45px rgba(23, 32, 38, 0.12);
+      --hover-shadow: 0 28px 65px rgba(23, 32, 38, 0.18);
+    }
+
+    body.dark {
+      --bg: #101820;
+      --bg-2: #17212b;
+      --card: rgba(31, 41, 55, 0.82);
+      --card-solid: #1f2937;
+      --text: #f9fafb;
+      --muted: #cbd5e1;
+      --line: rgba(255, 255, 255, 0.12);
+      --primary: #14b8a6;
+      --primary-dark: #0f766e;
+      --blue: #60a5fa;
+      --gold: #f4b84a;
+      --shadow: 0 20px 45px rgba(0, 0, 0, 0.35);
+      --hover-shadow: 0 28px 65px rgba(20, 184, 166, 0.18);
+    }
+
+    * {
+      box-sizing: border-box;
+    }
+
+    body {
+      margin: 0;
+      min-height: 100vh;
+      font-family: Arial, sans-serif;
+      background:
+        linear-gradient(135deg, var(--bg), var(--bg-2));
+      color: var(--text);
+      transition: background 0.35s ease, color 0.35s ease;
+    }
+
+    .container {
+      max-width: 1220px;
+      margin: auto;
+      padding: 26px;
+    }
+
+    .header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      gap: 18px;
+      margin-bottom: 22px;
+      padding: 24px;
+      border: 1px solid var(--line);
+      border-radius: 8px;
+      background: linear-gradient(135deg, rgba(17, 106, 99, 0.16), rgba(45, 108, 223, 0.10));
+      box-shadow: var(--shadow);
+      backdrop-filter: blur(16px);
+    }
+
+    .header h1 {
+      margin: 0;
+      color: var(--primary);
+      font-size: 34px;
+      letter-spacing: 0;
+    }
+
+    .header p {
+      margin: 8px 0 0;
+      color: var(--muted);
+      line-height: 1.5;
+    }
+
+    .theme-btn {
+      width: auto;
+      min-width: 150px;
+      background: var(--card-solid);
+      color: var(--text);
+      border: 1px solid var(--line);
+    }
+
+    .stats {
+      display: grid;
+      grid-template-columns: repeat(4, 1fr);
+      gap: 14px;
+      margin-bottom: 18px;
+    }
+
+    .stat-card,
+    .section {
+      background: var(--card);
+      border: 1px solid var(--line);
+      border-radius: 8px;
+      box-shadow: var(--shadow);
+      backdrop-filter: blur(16px);
+      transition:
+        transform 0.22s ease,
+        box-shadow 0.22s ease,
+        border-color 0.22s ease;
+    }
+
+    .stat-card:hover,
+    .section:hover {
+      transform: translateY(-4px);
+      box-shadow: var(--hover-shadow);
+      border-color: rgba(17, 106, 99, 0.35);
+    }
+
+    .stat-card {
+      padding: 16px;
+    }
+
+    .stat-card span {
+      display: block;
+      color: var(--muted);
+      font-size: 14px;
+      margin-bottom: 8px;
+    }
+
+    .stat-card strong {
+      font-size: 26px;
+    }
+
+    .grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 18px;
+    }
+
+    .section {
+      padding: 20px;
+      margin-bottom: 18px;
+    }
+
+    .section h2 {
+      margin: 0 0 6px;
+      font-size: 22px;
+    }
+
+    .section p {
+      margin: 0;
+      color: var(--muted);
+      line-height: 1.5;
+    }
+
+    input,
+    textarea,
+    button {
+      width: 100%;
+      font: inherit;
+      box-sizing: border-box;
+    }
+
+    input[type="file"] {
+      margin-top: 16px;
+      padding: 16px;
+      border: 1px dashed var(--primary);
+      border-radius: 8px;
+      background: rgba(128, 128, 128, 0.06);
+      color: var(--text);
+      cursor: pointer;
+    }
+
+    textarea {
+      margin-top: 16px;
+      min-height: 130px;
+      padding: 14px;
+      border: 1px solid var(--line);
+      border-radius: 8px;
+      background: rgba(128, 128, 128, 0.06);
+      color: var(--text);
+      resize: vertical;
+      outline: none;
+      transition: border-color 0.2s ease, box-shadow 0.2s ease;
+    }
+
+    textarea:focus {
+      border-color: var(--primary);
+      box-shadow: 0 0 0 4px rgba(17, 106, 99, 0.12);
+    }
+
+    button {
+      margin-top: 12px;
+      padding: 12px 14px;
+      border: none;
+      border-radius: 8px;
+      background: var(--primary);
+      color: white;
+      font-weight: bold;
+      cursor: pointer;
+      transition:
+        transform 0.18s ease,
+        box-shadow 0.18s ease,
+        background 0.18s ease;
+    }
+
+    button:hover {
+      background: var(--primary-dark);
+      transform: translateY(-2px);
+      box-shadow: 0 12px 24px rgba(17, 106, 99, 0.22);
+    }
+
+    button:active {
+      transform: translateY(0);
+    }
+
+    .secondary {
+      background: var(--blue);
+    }
+
+    .secondary:hover {
+      background: #1f56b6;
+    }
+
+    .light {
+      background: transparent;
+      color: var(--text);
+      border: 1px solid var(--line);
+    }
+
+    .light:hover {
+      background: rgba(128, 128, 128, 0.10);
+      box-shadow: none;
+    }
+
+    .output-box {
+      margin-top: 14px;
+      padding: 14px;
+      border: 1px solid var(--line);
+      border-radius: 8px;
+      background: rgba(128, 128, 128, 0.07);
+    }
+
+    .success {
+      color: var(--success);
+      font-weight: bold;
+    }
+
+    .error {
+      color: var(--danger);
+      font-weight: bold;
+    }
+
+    .preview {
+      margin-top: 10px;
+      max-height: 170px;
+      overflow: auto;
+      white-space: pre-wrap;
+      font-size: 14px;
+      color: var(--text);
+      background: rgba(255, 255, 255, 0.35);
+      border: 1px solid var(--line);
+      border-radius: 8px;
+      padding: 12px;
+    }
+
+    body.dark .preview {
+      background: rgba(0, 0, 0, 0.18);
+    }
+
+    .result-card,
+    .history-item {
+      margin-top: 12px;
+      padding: 14px;
+      border: 1px solid var(--line);
+      border-radius: 8px;
+      background: rgba(128, 128, 128, 0.07);
+      animation: fadeUp 0.28s ease both;
+    }
+
+    .result-card {
+      border-left: 4px solid var(--blue);
+    }
+
+    .history-item {
+      cursor: pointer;
+    }
+
+    .history-item:hover {
+      border-color: var(--primary);
+    }
+
+    .result-card h3 {
+      margin: 0 0 8px;
+      color: var(--primary);
+    }
+
+    .meta {
+      color: var(--muted);
+      font-size: 14px;
+      margin-bottom: 8px;
+    }
+
+    .empty {
+      color: var(--muted);
+    }
+
+    .spinner {
+      width: 24px;
+      height: 24px;
+      border: 3px solid rgba(128, 128, 128, 0.25);
+      border-top-color: var(--primary);
+      border-radius: 50%;
+      animation: spin 0.8s linear infinite;
+      margin-bottom: 10px;
+    }
+
+    .loading-row {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      color: var(--muted);
+    }
+
+    @keyframes spin {
+      to {
+        transform: rotate(360deg);
+      }
+    }
+
+    @keyframes fadeUp {
+      from {
+        opacity: 0;
+        transform: translateY(8px);
+      }
+      to {
+        opacity: 1;
+        transform: translateY(0);
+      }
+    }
+
+    @media (max-width: 850px) {
+      .grid,
+      .stats {
+        grid-template-columns: 1fr;
+      }
+
+      .header {
+        align-items: flex-start;
+        flex-direction: column;
+      }
+
+      .theme-btn {
+        width: 100%;
+      }
+    }
+  </style>
+</head>
+
+<body>
+  <div class="container">
+    <header class="header">
+      <div>
+        <h1>DocuMind</h1>
+        <p>Smart Document Search System using PDF extraction, embeddings, and FAISS semantic search.</p>
+      </div>
+      <button class="theme-btn" onclick="toggleTheme()">Toggle Light / Dark</button>
+    </header>
+
+    <section class="stats">
+      <div class="stat-card">
+        <span>Backend</span>
+        <strong id="backendText">Not Checked</strong>
+      </div>
+
+      <div class="stat-card">
+        <span>Documents</span>
+        <strong id="documentCount">0</strong>
+      </div>
+
+      <div class="stat-card">
+        <span>Chunks</span>
+        <strong id="chunkCount">0</strong>
+      </div>
+
+      <div class="stat-card">
+        <span>Searches</span>
+        <strong id="searchCount">0</strong>
+      </div>
+    </section>
+
+    <div class="grid">
+      <section class="section">
+        <h2>1. Upload PDF</h2>
+        <p>Upload a PDF. The backend extracts text, creates chunks, and stores embeddings.</p>
+
+        <input type="file" id="fileInput" accept=".pdf" />
+        <button onclick="uploadPDF()">Upload PDF</button>
+        <button class="secondary" onclick="checkBackend()">Check Backend</button>
+
+        <div id="uploadResult" class="output-box empty">
+          No PDF uploaded yet.
+        </div>
+      </section>
+
+      <section class="section">
+        <h2>2. Ask Question</h2>
+        <p>Ask a question from your uploaded PDF documents.</p>
+
+        <textarea id="questionInput" placeholder="Example: What is the main idea of this document?"></textarea>
+        <button onclick="searchPDF()">Search</button>
+        <button class="light" onclick="clearResults()">Clear</button>
+
+        <div id="answerBox" class="output-box">
+          <strong>Generated Answer</strong>
+          <p class="empty">The best matching result will appear here.</p>
+        </div>
+      </section>
+    </div>
+
+    <section class="section">
+      <h2>3. Source Matches</h2>
+      <p>Top matching chunks from uploaded PDFs.</p>
+
+      <div id="searchResults">
+        <div class="output-box empty">No source matches yet.</div>
+      </div>
+    </section>
+
+    <section class="section">
+      <h2>4. Search History</h2>
+      <p>Recent questions asked during this session.</p>
+
+      <div id="historyList">
+        <div class="output-box empty">No search history yet.</div>
+      </div>
+
+      <button class="light" onclick="clearHistory()">Clear History</button>
+    </section>
+  </div>
+
+  <script>
+    const API_BASE_URL = "http://127.0.0.1:8000";
+
+    let documentCount = 0;
+    let chunkCount = 0;
+    let searchCount = 0;
+    let history = JSON.parse(localStorage.getItem("documindHistory")) || [];
+
+    if (localStorage.getItem("documindTheme") === "dark") {
+      document.body.classList.add("dark");
+    }
+
+    renderHistory();
+
+    function toggleTheme() {
+      document.body.classList.toggle("dark");
+
+      if (document.body.classList.contains("dark")) {
+        localStorage.setItem("documindTheme", "dark");
+      } else {
+        localStorage.setItem("documindTheme", "light");
+      }
+    }
+
+    async function checkBackend() {
+      try {
+        const response = await fetch(`${API_BASE_URL}/`);
+        await response.json();
+
+        document.getElementById("backendText").textContent = "Online";
+        document.getElementById("backendText").style.color = "var(--success)";
+      } catch (error) {
+        document.getElementById("backendText").textContent = "Offline";
+        document.getElementById("backendText").style.color = "var(--danger)";
+      }
+    }
+
+    async function uploadPDF() {
+      const fileInput = document.getElementById("fileInput");
+      const uploadResult = document.getElementById("uploadResult");
+      const file = fileInput.files[0];
+
+      if (!file) {
+        alert("Please select a PDF file.");
+        return;
+      }
+
+      if (!file.name.toLowerCase().endsWith(".pdf")) {
+        alert("Only PDF files are allowed.");
+        return;
+      }
+
+      uploadResult.className = "output-box";
+      uploadResult.innerHTML = `
+        <div class="loading-row">
+          <div class="spinner"></div>
+          <span>Uploading and processing PDF...</span>
+        </div>
+      `;
+
+      const formData = new FormData();
+      formData.append("file", file);
+
+      try {
+        const response = await fetch(`${API_BASE_URL}/upload-pdf`, {
+          method: "POST",
+          body: formData
+        });
+
+        const data = await response.json();
+
+        if (!response.ok) {
+          uploadResult.innerHTML = `<p class="error">${escapeHTML(data.detail || "Upload failed")}</p>`;
+          return;
+        }
+
+        documentCount++;
+        chunkCount += data.total_chunks;
+        updateStats();
+
+        uploadResult.innerHTML = `
+          <p class="success">PDF uploaded successfully.</p>
+          <p><b>File:</b> ${escapeHTML(data.filename)}</p>
+          <p><b>Document ID:</b> ${escapeHTML(data.document_id)}</p>
+          <p><b>Total Characters:</b> ${data.total_characters}</p>
+          <p><b>Total Chunks:</b> ${data.total_chunks}</p>
+          <div class="preview">${escapeHTML(data.preview)}</div>
+        `;
+
+        fileInput.value = "";
+      } catch (error) {
+        uploadResult.innerHTML = `
+          <p class="error">Could not connect to backend.</p>
+          <p>Make sure FastAPI is running.</p>
+        `;
+      }
+    }
+
+    async function searchPDF() {
+      const query = document.getElementById("questionInput").value.trim();
+      const answerBox = document.getElementById("answerBox");
+      const searchResults = document.getElementById("searchResults");
+
+      if (!query) {
+        alert("Please enter a question.");
+        return;
+      }
+
+      answerBox.innerHTML = `
+        <strong>Generated Answer</strong>
+        <div class="loading-row">
+          <div class="spinner"></div>
+          <span>Searching documents...</span>
+        </div>
+      `;
+
+      searchResults.innerHTML = `
+        <div class="output-box">
+          <div class="loading-row">
+            <div class="spinner"></div>
+            <span>Finding source matches...</span>
+          </div>
+        </div>
+      `;
+
+      try {
+        const response = await fetch(
+          `${API_BASE_URL}/search?query=${encodeURIComponent(query)}`,
+          { method: "POST" }
+        );
+
+        const data = await response.json();
+
+        if (!response.ok) {
+          answerBox.innerHTML = `
+            <strong>Generated Answer</strong>
+            <p class="error">${escapeHTML(data.detail || "Search failed")}</p>
+          `;
+          searchResults.innerHTML = `<div class="output-box empty">No results found.</div>`;
+          return;
+        }
+
+        if (!data.results || data.results.length === 0) {
+          answerBox.innerHTML = `
+            <strong>Generated Answer</strong>
+            <p>No matching answer found.</p>
+          `;
+          searchResults.innerHTML = `<div class="output-box empty">No source matches found.</div>`;
+          return;
+        }
+
+        searchCount++;
+        updateStats();
+
+        const best = data.results[0];
+
+        answerBox.innerHTML = `
+          <strong>Generated Answer</strong>
+          <p>${escapeHTML(best.content)}</p>
+          <div class="meta">
+            Source: ${escapeHTML(best.filename)} |
+            Chunk: ${best.chunk_number} |
+            Score: ${Number(best.score).toFixed(4)}
+          </div>
+        `;
+
+        searchResults.innerHTML = data.results.map((result, index) => `
+          <div class="result-card" style="animation-delay: ${index * 0.04}s">
+            <h3>Match ${index + 1}</h3>
+            <div class="meta">
+              File: ${escapeHTML(result.filename)} |
+              Chunk: ${result.chunk_number} |
+              Score: ${Number(result.score).toFixed(4)}
+            </div>
+            <p>${escapeHTML(result.content)}</p>
+          </div>
+        `).join("");
+
+        saveHistory(query);
+      } catch (error) {
+        answerBox.innerHTML = `
+          <strong>Generated Answer</strong>
+          <p class="error">Could not connect to backend.</p>
+        `;
+      }
+    }
+
+    function updateStats() {
+      document.getElementById("documentCount").textContent = documentCount;
+      document.getElementById("chunkCount").textContent = chunkCount;
+      document.getElementById("searchCount").textContent = searchCount;
+    }
+
+    function saveHistory(question) {
+      history.unshift({
+        question,
+        time: new Date().toLocaleString()
+      });
+
+      history = history.slice(0, 6);
+      localStorage.setItem("documindHistory", JSON.stringify(history));
+      renderHistory();
+    }
+
+    function renderHistory() {
+      const historyList = document.getElementById("historyList");
+
+      if (history.length === 0) {
+        historyList.innerHTML = `<div class="output-box empty">No search history yet.</div>`;
+        return;
+      }
+
+      historyList.innerHTML = history.map(item => `
+        <div class="history-item" onclick="reuseQuestion('${escapeAttribute(item.question)}')">
+          <strong>${escapeHTML(item.question)}</strong>
+          <div class="meta">${escapeHTML(item.time)}</div>
+        </div>
+      `).join("");
+    }
+
+    function reuseQuestion(question) {
+      document.getElementById("questionInput").value = question;
+    }
+
+    function clearHistory() {
+      history = [];
+      localStorage.removeItem("documindHistory");
+      renderHistory();
+    }
+
+    function clearResults() {
+      document.getElementById("questionInput").value = "";
+
+      document.getElementById("answerBox").innerHTML = `
+        <strong>Generated Answer</strong>
+        <p class="empty">The best matching result will appear here.</p>
+      `;
+
+      document.getElementById("searchResults").innerHTML = `
+        <div class="output-box empty">No source matches yet.</div>
+      `;
+    }
+
+    function escapeHTML(value) {
+      return String(value)
+        .replaceAll("&", "&amp;")
+        .replaceAll("<", "&lt;")
+        .replaceAll(">", "&gt;")
+        .replaceAll('"', "&quot;")
+        .replaceAll("'", "&#039;");
+    }
+
+    function escapeAttribute(value) {
+      return escapeHTML(value).replaceAll("`", "&#096;");
+    }
+  </script>
+</body>
+</html>
